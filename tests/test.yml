@@ -1,0 +1,25 @@
+---
+- hosts: all
+  vars:
+    nonroot: "{{ (ansible_env.USER is undefined) | ternary(ansible_env.HOME != '/root', ansible_env.USER != 'root') }}"
+  roles:
+    - role: suzuki-shunsuke.docker-ce-centos
+      docker_centos_state: started
+      docker_centos_enabled: yes
+      become: "{{nonroot}}"
+    - role: suzuki-shunsuke.docker-py-centos
+      become: "{{nonroot}}"
+    - role: ansible-drone-server
+      drone_server_env:
+        DRONE_OPEN: "true"
+        DRONE_ORGS: suzuki-shunsuke
+        DRONE_ADMIN: suzuki-shunsuke
+        DRONE_HOST: "https://drone.example.com"
+        DRONE_GITHUB: "true"
+        DRONE_GITHUB_CLIENT: "drone_github_client"
+        DRONE_GITHUB_SECRET: "drone_github_secret"
+        DRONE_SECRET: "drone-secret"
+        DRONE_DATABASE_DRIVER: mysql
+        DRONE_DATABASE_DATASOURCE: drone:password@tcp(127.0.0.1:3306)/drone?parseTime=true
+        GIN_MODE: release
+      become: "{{nonroot}}"
