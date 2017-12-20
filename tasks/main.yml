@@ -28,5 +28,5 @@
       - "{{drone_server_port}}:{{drone_server_env.get('DRONE_SERVER_ADDR', 8000)}}"
       - "{{drone_server_grpc_port}}:9000"
     volumes: "{{drone_server_volumes | default('/var/lib/drone:{}'.format(drone_server_env.get('XDG_CACHE_HOME', '/var/lib/drone')))}}"
-    network_mode: host
+    network_mode: "{{drone_server_network_mode}}"
   when: drone_server_network_mode in ["host", "none"]
