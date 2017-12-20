@@ -1,18 +1,32 @@
-- name: Create a docker network
-  docker_network:
-    name: "{{drone_server_docker_network_name}}"
 - name: pull drone-server images
   docker_image:
     name: "{{drone_server_docker_image_name}}"
     tag: "{{drone_server_docker_image_tag}}"
+- block:
+  - name: Create a docker network
+    docker_network:
+      name: "{{drone_server_docker_network_name}}"
+  - name: create drone-server container
+    docker_container:
+      name: "{{drone_server_container_name}}"
+      image: "{{drone_server_docker_image_name}}:{{drone_server_docker_image_tag}}"
+      networks:
+        - name: "{{drone_server_docker_network_name}}"
+      env: "{{drone_server_env}}"
+      ports:
+        - "{{drone_server_port}}:{{drone_server_env.get('DRONE_SERVER_ADDR', 8000)}}"
+        - "{{drone_server_grpc_port}}:9000"
+      volumes: "{{drone_server_volumes | default('/var/lib/drone:{}'.format(drone_server_env.get('XDG_CACHE_HOME', '/var/lib/drone')))}}"
+      network_mode: "{{drone_server_network_mode}}"
+  when: drone_server_network_mode not in ["host", "none"]
 - name: create drone-server container
   docker_container:
     name: "{{drone_server_container_name}}"
     image: "{{drone_server_docker_image_name}}:{{drone_server_docker_image_tag}}"
-    networks:
-      - name: "{{drone_server_docker_network_name}}"
     env: "{{drone_server_env}}"
     ports:
       - "{{drone_server_port}}:{{drone_server_env.get('DRONE_SERVER_ADDR', 8000)}}"
       - "{{drone_server_grpc_port}}:9000"
     volumes: "{{drone_server_volumes | default('/var/lib/drone:{}'.format(drone_server_env.get('XDG_CACHE_HOME', '/var/lib/drone')))}}"
+    network_mode: host
+  when: drone_server_network_mode in ["host", "none"]
