@@ -7,3 +7,4 @@ drone_server_env: {}
 drone_server_port: 8000
 drone_server_grpc_port: 9000
 drone_server_container_name: drone-server
+drone_server_network_mode: null

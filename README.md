@@ -21,6 +21,7 @@ drone_server_port | no | 8000 |
 drone_server_grpc_port | no | 9000 |
 drone_server_container_name | no | drone-server |
 drone_server_volumes | no | ["/var/lib/drone:/var/lib/drone/{}".format(drone_server_env.get('XDG_CACHE_HOME', '/var/lib/drone'))] |
+drone_server_network_mode | no | null |
 
 About `drone_server_env`, see the following links.
 
